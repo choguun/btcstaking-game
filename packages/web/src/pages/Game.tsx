@@ -11,10 +11,11 @@ import {
     useWalletStore,
     useWallets,
 } from "@roochnetwork/rooch-sdk-kit";
-import {enqueueSnackbar} from "notistack";
 import React, {useState} from "react";
-import {shortAddress} from "../utils";
-import {contractAddress, puzzlefiCoinModule, puzzleGameModule, roochGasCoinType} from "../constants.ts";
+import {contractAddress, gameLogicModule, satTokenModule, roochGasCoinType} from "../constants.ts";
+
+import ConnectButton from "@/components/ConnectButton";
+import { Button } from "@/components/ui/button";
 
 function Game() {
     const wallets = useWallets();
@@ -37,41 +38,37 @@ function Game() {
   
     return (
       <>
-        <button
-          onClick={async () => {
-              if (connectionStatus === "connected") {
-                  setWalletDisconnected();
-                  return;
-              }
-  
-              await connectWallet({wallet: wallets[0]});
-          }}
-      >
-          {connectionStatus === "connected"
-              ? shortAddress(currentAddress?.toStr(), 8, 6) + " |" + (Number(BalanceResult?.balance) / (10 ** Number(BalanceResult?.decimals))).toFixed(2).toString() + BalanceResult?.symbol
-              : "Connect Wallet"}
-      </button>
+      <nav className="w-full p-4 bg-orange-400">
+        <ConnectButton /> 
+      </nav>
       <div className="flex flex-col items-center justify-center">
-            <div>
-              <a href={"https://btcstaking.testnet.babylonchain.io/"} target="_blank">Stake more BTC</a>
+            <div className="mt-3">
+              <a href={"https://btcstaking.testnet.babylonchain.io/"} className="text-xl underline text-blue-600" target="_blank">Stake more BTC(Babylon)</a>
             </div>
-            <div>
-                <span>Total Chips can mint</span>
-                <span>0</span>
+            <div className="mt-5 mx-auto p-10 bg-orange-300 rounded-md">
+                <div>
+                    <span>Total Chips can mint</span>
+                    <span>: </span>
+                    <span>0</span>
+                </div>
+                <div>
+                    <span>Current Chips</span>
+                    <span>: </span>
+                    <span> 0</span>
+                </div>
+                <div>
+                    <span></span>
+                </div>
+                <div>
+                    <input></input>
+                    <Button>Mint Chips</Button>
+                </div>
             </div>
-            <div>
-              <span>Current Chips</span>
-              <span>0</span>
-            </div>
-            <div>
-              <span></span>
-            </div>
-            <div>
-              <input></input>
-              <button>Mint Chips</button>
-            </div>
-            <div>
-              <button>JOIN ROOM</button>
+
+            <div className="mt-5 mx-auto p-10 bg-orange-300 rounded-md">
+                <div>
+                    <span>Create Room</span>
+                </div>
             </div>
       </div>
       </>

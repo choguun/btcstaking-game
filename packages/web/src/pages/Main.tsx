@@ -1,45 +1,15 @@
 
-import {Args, Transaction} from "@roochnetwork/rooch-sdk";
 import {
-    UseSignAndExecuteTransaction,
-    useConnectWallet,
-    useCreateSessionKey,
-    useCurrentAddress,
-    useCurrentSession,
-    useRemoveSession,
-    useRoochClientQuery,
     useWalletStore,
-    useWallets,
 } from "@roochnetwork/rooch-sdk-kit";
-import {enqueueSnackbar} from "notistack";
-import React, {useState} from "react";
-import {shortAddress} from "../utils";
-import {contractAddress, puzzlefiCoinModule, puzzleGameModule, roochGasCoinType} from "../constants.ts";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import Logo from "../assets/images/logos/btc-staking-logo.jpg";
 
 import ConnectButton from "@/components/ConnectButton";
 
 function Main() {
-    const wallets = useWallets();
-    const currentAddress = useCurrentAddress();
-    const sessionKey = useCurrentSession();
     const connectionStatus = useWalletStore((state) => state.connectionStatus);
-    const setWalletDisconnected = useWalletStore(
-        (state) => state.setWalletDisconnected
-    );
     const navigate = useNavigate();
-    const {mutateAsync: connectWallet} = useConnectWallet();
-  
-    const {mutateAsync: createSessionKey} = useCreateSessionKey();
-    const {mutateAsync: removeSessionKey} = useRemoveSession();
-    const {mutateAsync: signAndExecuteTransaction} = UseSignAndExecuteTransaction();
-  
-    const {data: BalanceResult, refetch} = useRoochClientQuery("getBalance", {
-      owner: currentAddress?.genRoochAddress().toStr() || "",
-      coinType: roochGasCoinType
-    })
   
     return (
       <>
@@ -67,7 +37,7 @@ function Main() {
                     <>
                     <br/>
                 <button
-                    className="p-4 bg-orange-400 text-white text-xl rounded-xl cursor-pointer mt-2"
+                    className="p-4 bg-orange-400 text-white text-lg rounded-xl cursor-pointer mt-2"
                     onClick={() => navigate("/game")}
                 >
                     PRESS START GAME
@@ -75,7 +45,7 @@ function Main() {
                 </>
                 )}
             </div>
-            <div className="relative z-10 mt-2 text-center">
+            <div className="relative z-10 mt-2 text-center underline">
                 <a href={"https://test-portal.rooch.network/faucet/"} target="_blank">
                 <span>FAUCET</span>
                 </a>
