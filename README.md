@@ -2,4 +2,4 @@
 
 ### Building on-chain idle battle game leverage Bitcoin staking of Babylon and Rooch Stack
 
-
+### On-chain fair game leveraging Babylon and Rooch
