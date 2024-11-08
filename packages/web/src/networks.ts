@@ -10,6 +10,9 @@ const { networkConfig, useNetworkVariable, useNetworkVariables } =
     testnet: {
       url: getRoochNodeUrl("testnet"),
     },
+    localnet: {
+      url: getRoochNodeUrl("localnet"),
+    },
   });
 
 export { useNetworkVariable, useNetworkVariables, networkConfig };
