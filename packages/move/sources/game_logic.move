@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // game_logic.move
-module btcstaking::game_logic {
+module btcstaking2::game_logic {
     use std::string;
     use std::option;
     use std::vector;
@@ -15,11 +15,12 @@ module btcstaking::game_logic {
     use rooch_framework::coin::{Self, Coin, CoinInfo};
     use rooch_framework::account_coin_store;
     use rooch_framework::gas_coin::{Self};
+    use rooch_framework::coin_store::{Self, CoinStore};
     use rooch_framework::simple_rng;
     use bitcoin_move::utxo::{Self, UTXO};
     use bitcoin_move::bitcoin;
     use bitcoin_move::types::{Self, Header};
-    use btcstaking::sat_token::{Self, SAT, borrow_coin_info};
+    use btcstaking2::sat_token::{Self, SAT, borrow_coin_info};
 
     /// The decimals of the `BTC Holder Coin`
     const DECIMALS: u8 = 1u8;
@@ -43,7 +44,7 @@ module btcstaking::game_logic {
     }
 
     struct WorldInfo has key, store {
-        total_chip: u64,
+        total_chip: u256,
         protocol_fee: u256,
         collect_fee: u256,
     }
@@ -52,8 +53,13 @@ module btcstaking::game_logic {
         battle_room_id: u64,
         player1: address,
         player2: address,
-        player1_chip: u64,
-        player2_chip: u64,
+        player1_chip: u256,
+        player2_chip: u256,
+    }
+
+    // construct the `SAT` coin and make it a global object that stored in `Treasury`.
+    struct Treasury<phantom CoinType: key+store> has key {
+        coin_store: Object<CoinStore<SAT<CoinType>>>
     }
 
     /// Capability to modify parameter
@@ -73,13 +79,14 @@ module btcstaking::game_logic {
         winner: address,
     }
 
-    fun init() {
+    fun init<CoinType: key+store>() {
         let coin_info_obj = coin::register_extend<HDC>(
             string::utf8(b"BTC Holder Coin"),
             string::utf8(b"HDC"),
             option::some(string::utf8(b"BTC Holder Coin")),
             DECIMALS,
         );
+
         let coin_info_holder_obj = object::new_named_object(CoinInfoHolder { coin_info: coin_info_obj });
         // Make the coin info holder object to shared, so anyone can get mutable CoinInfoHolder object
         object::to_shared(coin_info_holder_obj);
@@ -89,10 +96,22 @@ module btcstaking::game_logic {
             protocol_fee: PROTOCOL_FEE,
             collect_fee: 0,
         });
+
         object::to_shared(world_info);
+
+        // Create an empty coin store for the `SAT` coin type
+        let coin_store_obj = coin_store::create_coin_store<SAT<CoinType>>();
+
+        // Create the `Treasury` object containing the `coin_store`
+        let treasury_obj = object::new_named_object(Treasury {
+            coin_store: coin_store_obj
+        });
+
+        object::to_shared(treasury_obj);
 
         let admin_cap = object::new_named_object(AdminCap {});
         transfer(admin_cap, sender());
+
         emit(CreateGameEvent {});
     }
 
@@ -132,7 +151,19 @@ module btcstaking::game_logic {
         account_coin_store::deposit(address_of(signer), sat_token::mint<CoinType>(amount));
     }
 
-    public entry fun create_battle_room(world_info: &mut Object<WorldInfo>, bet_chip: u64) {
+    public entry fun create_battle_room<CoinType: key+store>(
+        signer: &signer,
+        world_info: &mut Object<WorldInfo>,
+        treasury_obj: &mut Object<Treasury<CoinType>>,
+        bet_chip: u256
+    ) {
+        // Withdraw the `sat_token` from the player's wallet using the signer directly
+        let sat_token_withdrawn = account_coin_store::withdraw<SAT<CoinType>>(signer, bet_chip);
+
+        // Deposit the withdrawn `sat_token` into the Treasury's coin_store
+        let treasury = object::borrow_mut(treasury_obj);
+        coin_store::deposit<SAT<CoinType>>(&mut treasury.coin_store, sat_token_withdrawn);
+
         let battle_room_id = timestamp::now_seconds() / 100000;
         let world = object::borrow_mut(world_info);
         world.total_chip = world.total_chip + bet_chip;
@@ -150,7 +181,8 @@ module btcstaking::game_logic {
         emit(CreateBattleRoomEvent { battleRoomId: battle_room_id, player: tx_context::sender() });
     }
 
-    public entry fun join_battle_room(world_info: &mut Object<WorldInfo>, battle_room_id: u64, bet_chip: u64) {
+
+    public entry fun join_battle_room(world_info: &mut Object<WorldInfo>, battle_room_id: u64, bet_chip: u256) {
         let world = object::borrow_mut(world_info);
         world.total_chip = world.total_chip + bet_chip;
 

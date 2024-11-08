@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // sat_token.move
-module btcstaking::sat_token {
+module btcstaking2::sat_token {
 
     use std::string;
     use std::option;
@@ -15,7 +15,7 @@ module btcstaking::sat_token {
     use moveos_std::signer::{module_signer, address_of};
     use rooch_framework::gas_coin::{RGas, decimals};
 
-    friend btcstaking::game_logic;
+    friend btcstaking2::game_logic;
 
     const DECIMALS: u8 = 1u8;
 
