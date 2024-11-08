@@ -21,21 +21,32 @@ import { Button } from "@/components/ui/button";
 
 function Game() {
     const wallets = useWallets();
+    const currentAddress = useCurrentAddress();
     const {mutateAsync: connectWallet} = useConnectWallet();
   
     const {mutateAsync: createSessionKey} = useCreateSessionKey();
     const {mutateAsync: removeSessionKey} = useRemoveSession();
     const {mutateAsync: signAndExecuteTransaction} = UseSignAndExecuteTransaction();
 
+    const [totalChip, setTotalChip] = useState(10000);
     const [mintAmount, setMintAmount] = useState(0);
     const [betAmount, setBetAmount] = useState(0);
     const [battleRoomId, setBattleRoomId] = useState(0);
-    const [txnLoading, setTxnLoading] = useState(false);
+    const [, setTxnLoading] = useState(false);
+
+    const {data: coins, refetch: coinsFetch} = useRoochClientQuery("executeViewFunction", {
+        target: `0x3::account_coin_store::balance`,
+        args: [Args.address(currentAddress?.genRoochAddress().toStr() || "")],
+        typeArgs: [`${contractAddress}::${satTokenModule}::PFC<${roochGasCoinType}>`]
+    })
   
     return (
       <>
-        <nav className="w-full p-4 bg-orange-400">
-            <ConnectButton /> 
+        <nav className="w-full p-4 bg-orange-400 h-[65px]">
+            <span className="font-bold mr-5"><a href="/">BTC STAKING IDLE BATTLE GAME</a></span>
+            <div className="float-right">
+                <ConnectButton />
+            </div>
         </nav>
         <div className="flex flex-col items-center justify-center mb-10">
             <div className="mt-3">
@@ -45,12 +56,12 @@ function Game() {
                 <div>
                     <span className="font-bold">Total Chips can mint</span>
                     <span className="font-bold">: </span>
-                    <span className="font-bold">0</span>
+                    <span className="font-bold">{totalChip.toLocaleString(undefined)}</span>
                 </div>
                 <div>
                     <span className="font-bold">Current Chips</span>
                     <span className="font-bold">: </span>
-                    <span className="font-bold"> 0</span>
+                    <span className="font-bold"> {(Number(Number(coins?.return_values?.[0].decoded_value.toString()) / 10 ** 8)) || 0}</span>
                 </div>
                 <div>
                     <span></span>
@@ -79,7 +90,7 @@ function Game() {
                                         } else if (res.execution_info.status.type === "moveabort") {
                                             toast.error("mint failed");
                                         }
-                                        // await Promise.all([refetch(), roundResultFetch(), PoolResultRefetch(), coinsFetch()]);
+                                        await Promise.all([coinsFetch()]);
                                     } catch (error) {
                                         console.error(String(error));
                                     } finally {
@@ -98,7 +109,7 @@ function Game() {
                 </div>
                 <div className="mt-3">
                     <span className="">Bet Amount: </span>
-                    <input className="p-1 border border-1 border-solid border-black border-round-md" type="number"></input>
+                    <input className="p-1 border border-1 border-solid border-black border-round-md" type="number" onChange={(data) => setBetAmount(parseInt(data.target.value))}></input>
                 </div>
                 <div className="mt-5">
                     <Button>
@@ -117,7 +128,7 @@ function Game() {
                 </div>
                 <div className="mt-3">
                     <span className="">Battle Room ID: </span>
-                    <input className="p-1 border border-1 border-solid border-black border-round-md" type="number"></input>
+                    <input className="p-1 border border-1 border-solid border-black border-round-md" type="number" onChange={(data) => setBattleRoomId(parseInt(data.target.value))}></input>
                 </div>
                 <div className="mt-3">
                     <span className="">Bet Amount: </span>
