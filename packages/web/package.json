@@ -10,17 +10,22 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@babylonlabs-io/btc-staking-ts": "^0.3.0",
+    "@bitcoin-js/tiny-secp256k1-asmjs": "^2.2.3",
+    "@bitcoinerlab/secp256k1": "^1.1.1",
     "@radix-ui/react-slot": "^1.1.0",
     "@roochnetwork/rooch-sdk": "^0.2.7",
     "@roochnetwork/rooch-sdk-kit": "^0.2.7",
     "@tanstack/react-query": "^5.59.19",
     "@telegram-apps/sdk-react": "^2.0.9",
     "@telegram-apps/telegram-ui": "^2.1.8",
+    "bitcoinjs-lib": "7.0.0-rc.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.454.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-hot-toast": "^2.4.1",
     "react-router-dom": "^6.28.0",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7"

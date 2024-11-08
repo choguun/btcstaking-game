@@ -2,6 +2,8 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { RoochProvider, WalletProvider } from "@roochnetwork/rooch-sdk-kit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "react-hot-toast";
+
 import { networkConfig } from "./networks";
 
 import './index.css'
@@ -33,11 +35,12 @@ const router = createBrowserRouter([
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
-    <RoochProvider networks={networkConfig} defaultNetwork="testnet">
-      <WalletProvider chain={"bitcoin"} autoConnect>
-        <RouterProvider router={router} />
+      <RoochProvider networks={networkConfig} defaultNetwork="testnet">
+        <WalletProvider chain={"bitcoin"} autoConnect>
+          <Toaster/>
+          <RouterProvider router={router} />
         </WalletProvider>
-      </RoochProvider>
+        </RoochProvider>
     </QueryClientProvider>
   );
 }

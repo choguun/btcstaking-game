@@ -1,20 +1,12 @@
-
-import {Args, Transaction} from "@roochnetwork/rooch-sdk";
 import {
-    UseSignAndExecuteTransaction,
     useConnectWallet,
-    useCreateSessionKey,
     useCurrentAddress,
-    useCurrentSession,
-    useRemoveSession,
     useRoochClientQuery,
     useWalletStore,
     useWallets,
 } from "@roochnetwork/rooch-sdk-kit";
-import {enqueueSnackbar} from "notistack";
-import React, {useState} from "react";
-import {shortAddress} from "../utils";
-import {contractAddress, puzzlefiCoinModule, puzzleGameModule, roochGasCoinType} from "../constants.ts";
+import { shortAddress } from "../utils";
+import { roochGasCoinType } from "../constants.ts";
 import { Button } from "@/components/ui/button";
 
 const ConnectButton = () => {
@@ -43,7 +35,7 @@ const ConnectButton = () => {
         }}
     >
         {connectionStatus === "connected"
-            ? shortAddress(currentAddress?.toStr(), 8, 6) + " |" + (Number(BalanceResult?.balance) / (10 ** Number(BalanceResult?.decimals))).toFixed(2).toString() + BalanceResult?.symbol
+            ? shortAddress(currentAddress?.toStr(), 8, 6) + " | " + (Number(BalanceResult?.balance) / (10 ** Number(BalanceResult?.decimals))).toFixed(2).toString() + BalanceResult?.symbol
             : "Connect Wallet"}
     </Button>
     )

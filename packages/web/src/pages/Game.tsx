@@ -11,26 +11,26 @@ import {
     useWalletStore,
     useWallets,
 } from "@roochnetwork/rooch-sdk-kit";
-import React, {useState} from "react";
-import {contractAddress, gameLogicModule, satTokenModule, roochGasCoinType} from "../constants.ts";
+import React, { useState } from "react";
+import toast from "react-hot-toast";
+
+import { contractAddress, gameLogicModule, satTokenModule, roochGasCoinType } from "../constants.ts";
 
 import ConnectButton from "@/components/ConnectButton";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 function Game() {
     const wallets = useWallets();
-    const currentAddress = useCurrentAddress();
-    const sessionKey = useCurrentSession();
-    const connectionStatus = useWalletStore((state) => state.connectionStatus);
-    const setWalletDisconnected = useWalletStore(
-        (state) => state.setWalletDisconnected
-    );
     const {mutateAsync: connectWallet} = useConnectWallet();
   
     const {mutateAsync: createSessionKey} = useCreateSessionKey();
     const {mutateAsync: removeSessionKey} = useRemoveSession();
     const {mutateAsync: signAndExecuteTransaction} = UseSignAndExecuteTransaction();
+
+    const [mintAmount, setMintAmount] = useState(0);
+    const [betAmount, setBetAmount] = useState(0);
+    const [battleRoomId, setBattleRoomId] = useState(0);
+    const [txnLoading, setTxnLoading] = useState(false);
   
     return (
       <>
@@ -56,8 +56,39 @@ function Game() {
                     <span></span>
                 </div>
                 <div>
-                    <input className="p-1 border border-1 border-solid border-black border-round-md" type="number"></input>
-                    <Button className="ml-2">Mint Chips</Button>
+                    <input className="p-1 border border-1 border-solid border-black border-round-md" type="number" onChange={(data) => setMintAmount(parseInt(data.target.value))}></input>
+                    <Button className="ml-2" 
+                        onClick={
+                                async () => {
+                                    try {
+                                        setTxnLoading(true);
+                                        const txn = new Transaction();
+                                        txn.callFunction({
+                                            address: contractAddress,
+                                            module: gameLogicModule,
+                                            function: "mint_chip",
+                                            args: [
+                                                // amount
+                                                Args.u256(BigInt(mintAmount)),
+                                            ],
+                                            typeArgs: [roochGasCoinType]
+                                        });
+                                        const res = await signAndExecuteTransaction({transaction: txn});
+                                        if (res.execution_info.status.type === "executed") {
+                                            toast.success("mint success");
+                                        } else if (res.execution_info.status.type === "moveabort") {
+                                            toast.error("mint failed");
+                                        }
+                                        // await Promise.all([refetch(), roundResultFetch(), PoolResultRefetch(), coinsFetch()]);
+                                    } catch (error) {
+                                        console.error(String(error));
+                                    } finally {
+                                        setTxnLoading(false);
+                                    }
+                                }
+                    }>
+                        Mint Chips
+                    </Button>
                 </div>
             </div>
 
@@ -96,6 +127,19 @@ function Game() {
                     <Button>
                         Battle
                     </Button>
+                </div>
+            </div>
+
+            <div className="mt-5 mx-auto px-10 py-4 bg-orange-300 rounded-md flex flex-col items-center justify-center w-[50%]">
+                <div>
+                    <span className="font-black text-xl">Result!</span>
+                </div>
+                <div className="mt-3 bg-orange-500 w-full p-2 text-center text-md">
+                    <span className="font-black">You are: Winner</span><br/>
+                    <hr className="mt-3 mb-3 border-black" />
+                    <span>Round: 1: Win</span><br/>
+                    <span>Round: 2: Lose</span><br/>
+                    <span>Round: 2: Win</span>
                 </div>
             </div>
         </div>
