@@ -1,0 +1,16 @@
+{
+  "name": "bitcoin_sign",
+  "type": "module",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "timophey01 <timophey01@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@okxweb3/coin-bitcoin": "^1.0.26",
+    "axios": "^1.7.7",
+    "bip32": "^5.0.0-rc.0",
+    "bitcoinjs-lib": "^7.0.0-rc.0",
+    "ecpair": "^3.0.0-rc.0",
+    "tiny-secp256k1": "^2.2.3"
+  }
+}
