@@ -9,7 +9,7 @@ module btcstaking::game_logic {
     use moveos_std::signer;
     use moveos_std::timestamp;
     use moveos_std::tx_context::{Self, sender};
-    use moveos_std::object::{Self, Object, transfer, borrow, exists};
+    use moveos_std::object::{Self, Object, transfer, borrow};
     use moveos_std::event::emit;
     use moveos_std::signer::{module_signer, address_of};
     use rooch_framework::coin::{Self, Coin, CoinInfo};
@@ -150,38 +150,12 @@ module btcstaking::game_logic {
         emit(CreateBattleRoomEvent { battleRoomId: battle_room_id, player: tx_context::sender() });
     }
 
-    /// Function to query a `BattleRoom` by `battle_room_id`
-    public fun get_battle_room_by_id(battle_room_id: u64): Option<&BattleRoom> {
-        if (exists<BattleRoom>(battle_room_id)) {
-            return Option::some(borrow<BattleRoom>(battle_room_id));
-        } else {
-            return Option::none();
-        }
-    }
-
     public entry fun join_battle_room(world_info: &mut Object<WorldInfo>, battle_room_id: u64, bet_chip: u64) {
         let world = object::borrow_mut(world_info);
         world.total_chip = world.total_chip + bet_chip;
 
-        let battle_room = find_battle_room(battle_room_id);
-        
         
         emit(JoinBattleRoomEvent { battleRoomId: battle_room_id, player: tx_context::sender() });
-    }
-
-    public entry fun battle(world_info: &mut Object<WorldInfo>, battle_room_id: u64, winner: address) {
-        let battle_room = object::borrow_shared<BattleRoom>(battle_room_id);
-        let battle_room = object::borrow_mut(battle_room);
-        let world = object::borrow_mut(world_info);
-
-        let total_chip = battle_room.player1_chip + battle_room.player2_chip;
-        if winner == battle_room.player1 {
-            account_coin_store::deposit(battle_room.player1, Coin<HDC>(total_chip));
-        } else {
-            account_coin_store::deposit(battle_room.player2, Coin<HDC>(total_chip));
-        }
-
-        world.total_chip = world.total_chip - total_chip;
     }
 
     // admin part

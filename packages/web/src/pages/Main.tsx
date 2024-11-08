@@ -27,9 +27,13 @@ function Main() {
             <div className="relative z-10 -mt-10 mb-5">
                 <img
                 src={Logo}
-                className="w-[15vw] -mt-10"
+                className="w-[13vw] -mt-10"
                 alt="logo"
                 />
+            </div>
+            <div className="relative z-10 mb-5 text-center">
+                <h1 className="text-3xl font-bold text-black">BTC Staking Battle Idle Game</h1>
+                <h2 className="text-xl text-black">On-chain fair betting game leveraging Babylon and Rooch</h2>
             </div>
             <div className="relative z-10">
                 <ConnectButton />
