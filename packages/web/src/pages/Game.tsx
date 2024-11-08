@@ -41,7 +41,7 @@ function Game() {
             <div className="mt-3">
               <a href={"https://btcstaking.testnet.babylonchain.io/"} className="text-xl underline text-blue-600" target="_blank">Stake more BTC(Babylon)</a>
             </div>
-            <div className="mt-5 mx-auto p-10 bg-orange-300 rounded-md">
+            <div className="mt-5 mx-auto px-10 py-6 bg-orange-300 rounded-md">
                 <div>
                     <span className="font-bold">Total Chips can mint</span>
                     <span className="font-bold">: </span>
