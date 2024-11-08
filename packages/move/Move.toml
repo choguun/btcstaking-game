@@ -9,7 +9,7 @@ RoochFramework = { git = "https://github.com/rooch-network/rooch.git", subdir = 
 BitcoinMove = { git = "https://github.com/rooch-network/rooch.git", subdir = "frameworks/bitcoin-move", rev = "main" }
 
 [addresses]
-btcstaking = "_"
+btcstaking = "0xda5f95f0c561838f32b503ea3878fd3f6891b4e75e8364ca6ea13d003d9beb09"
 std = "0x1"
 moveos_std = "0x2"
 rooch_framework = "0x3"

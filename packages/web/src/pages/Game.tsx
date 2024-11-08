@@ -33,11 +33,40 @@ function Game() {
     const [betAmount, setBetAmount] = useState(0);
     const [battleRoomId, setBattleRoomId] = useState(0);
     const [, setTxnLoading] = useState(false);
+    const [sessionLoading, setSessionLoading] = useState(false);
+
+    const handlerCreateSessionKey = async () => {
+        if (sessionLoading) {
+            return;
+        }
+        setSessionLoading(true);
+        const defaultScopes = [`${contractAddress}::*::*`];
+        createSessionKey(
+            {
+                appName: "btcstaking",
+                appUrl: "http://localhost:5173",
+                maxInactiveInterval: 3600,
+                scopes: defaultScopes,
+            },
+            {
+                onSuccess: (result) => {
+                    console.log("session key", result);
+                },
+                onError: (error) => {
+                    if (String(error).includes("1004")) {
+                        toast.error("Insufficient gas, please claim gas first");
+                    } else {
+                        toast.error(String(error));
+                    }
+                },
+            }
+        ).finally(() => setSessionLoading(false));
+    };
 
     const {data: coins, refetch: coinsFetch} = useRoochClientQuery("executeViewFunction", {
         target: `0x3::account_coin_store::balance`,
         args: [Args.address(currentAddress?.genRoochAddress().toStr() || "")],
-        typeArgs: [`${contractAddress}::${satTokenModule}::PFC<${roochGasCoinType}>`]
+        typeArgs: [`${contractAddress}::${satTokenModule}::SAT<${roochGasCoinType}>`]
     })
   
     return (
@@ -52,7 +81,12 @@ function Game() {
             <div className="mt-3">
               <a href={"https://btcstaking.testnet.babylonchain.io/"} className="text-xl underline text-blue-600" target="_blank">Stake more BTC(Babylon)</a>
             </div>
-            <div className="mt-5 mx-auto px-10 py-6 bg-orange-300 rounded-md">
+            <div className="mt-5">
+                <Button onClick={handlerCreateSessionKey}>
+                    Create Session Key
+                </Button>
+            </div>
+            <div className="mt-3 mx-auto px-10 py-6 bg-orange-300 rounded-md">
                 <div>
                     <span className="font-bold">Total Chips can mint</span>
                     <span className="font-bold">: </span>
@@ -61,7 +95,7 @@ function Game() {
                 <div>
                     <span className="font-bold">Current Chips</span>
                     <span className="font-bold">: </span>
-                    <span className="font-bold"> {(Number(Number(coins?.return_values?.[0].decoded_value.toString()) / 10 ** 8)) || 0}</span>
+                    <span className="font-bold"> {(Number(Number(coins?.return_values?.[0].decoded_value.toString()))) || 0}</span>
                 </div>
                 <div>
                     <span></span>
