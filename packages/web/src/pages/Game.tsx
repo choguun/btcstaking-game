@@ -1,38 +1,34 @@
-
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-ignore
 import {Args, Transaction} from "@roochnetwork/rooch-sdk";
 import {
     UseSignAndExecuteTransaction,
-    useConnectWallet,
     useCreateSessionKey,
     useCurrentAddress,
     useCurrentSession,
     useRemoveSession,
     useRoochClientQuery,
-    useWalletStore,
-    useWallets,
 } from "@roochnetwork/rooch-sdk-kit";
-import React, { useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 
-import { contractAddress, gameLogicModule, satTokenModule, roochGasCoinType } from "../constants.ts";
+import { contractAddress, WorldInfoObject, gameLogicModule, satTokenModule, roochGasCoinType } from "../constants.ts";
 
 import ConnectButton from "@/components/ConnectButton";
 import { Button } from "@/components/ui/button";
 
 function Game() {
-    const wallets = useWallets();
     const currentAddress = useCurrentAddress();
-    const {mutateAsync: connectWallet} = useConnectWallet();
-  
+    const sessionKey = useCurrentSession();
+
     const {mutateAsync: createSessionKey} = useCreateSessionKey();
     const {mutateAsync: removeSessionKey} = useRemoveSession();
-    const sessionKey = useCurrentSession();
     const {mutateAsync: signAndExecuteTransaction} = UseSignAndExecuteTransaction();
 
-    const [totalChip, setTotalChip] = useState(10000);
+    const [totalChip,] = useState(10000);
     const [mintAmount, setMintAmount] = useState(0);
     const [betAmount, setBetAmount] = useState(0);
-    const [battleRoomId, setBattleRoomId] = useState(0);
+    const [, setBattleRoomId] = useState(0);
     const [, setTxnLoading] = useState(false);
     const [sessionLoading, setSessionLoading] = useState(false);
 
@@ -70,7 +66,10 @@ function Game() {
         typeArgs: [`${contractAddress}::${satTokenModule}::SAT<${roochGasCoinType}>`]
     });
 
-
+    // const {data: RoundResult, refetch: roundResultFetch} = useRoochClientQuery("executeViewFunction", {
+    //     target: `${contractAddress}::${gameLogicModule}::get_round_and_result`,
+    //     typeArgs: [roochGasCoinType]
+    // });
   
     return (
       <>
@@ -164,7 +163,37 @@ function Game() {
                     <input className="p-1 border border-1 border-solid border-black border-round-md" type="number" onChange={(data) => setBetAmount(parseInt(data.target.value))}></input>
                 </div>
                 <div className="mt-5">
-                    <Button>
+                <Button className="ml-2" 
+                        onClick={
+                                async () => {
+                                    try {
+                                        setTxnLoading(true);
+                                        const txn = new Transaction();
+                                        txn.callFunction({
+                                            address: contractAddress,
+                                            module: gameLogicModule,
+                                            function: "create_battle_room",
+                                            args: [
+                                                // WorldInfoObject
+                                                Args.objectId(WorldInfoObject),
+                                                // amount
+                                                Args.u64(BigInt(betAmount)),
+                                            ]
+                                        });
+                                        const res = await signAndExecuteTransaction({transaction: txn});
+                                        if (res.execution_info.status.type === "executed") {
+                                            toast.success("create battle success");
+                                        } else if (res.execution_info.status.type === "moveabort") {
+                                            toast.error("create battle failed");
+                                        }
+                                        await Promise.all([coinsFetch()]);
+                                    } catch (error) {
+                                        console.error(String(error));
+                                    } finally {
+                                        setTxnLoading(false);
+                                    }
+                                }
+                    }>
                         Create Battle Room
                     </Button>
                 </div>

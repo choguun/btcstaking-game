@@ -18,7 +18,7 @@ const ConnectButton = () => {
     );
     const {mutateAsync: connectWallet} = useConnectWallet();
   
-    const {data: BalanceResult, refetch} = useRoochClientQuery("getBalance", {
+    const {data: BalanceResult} = useRoochClientQuery("getBalance", {
       owner: currentAddress?.genRoochAddress().toStr() || "",
       coinType: roochGasCoinType
     })
