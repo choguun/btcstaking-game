@@ -53,7 +53,11 @@ function Game() {
       </button>
       <div className="flex flex-col items-center justify-center">
             <div>
-              <button>Stake more BTC</button>
+              <a href={"https://btcstaking.testnet.babylonchain.io/"} target="_blank">Stake more BTC</a>
+            </div>
+            <div>
+                <span>Total Chips can mint</span>
+                <span>0</span>
             </div>
             <div>
               <span>Current Chips</span>
