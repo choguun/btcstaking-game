@@ -1,3 +1,5 @@
 # BTC STAKING IDLE BATTLE GAME
 
-### Bulding on-chain idle battle game lervage Bitcoin staking of Babylon and Rooch Stack
+### Building on-chain idle battle game leverage Bitcoin staking of Babylon and Rooch Stack
+
+### On-chain fair game leveraging Babylon and Rooch
