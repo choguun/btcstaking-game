@@ -26,6 +26,7 @@ function Game() {
   
     const {mutateAsync: createSessionKey} = useCreateSessionKey();
     const {mutateAsync: removeSessionKey} = useRemoveSession();
+    const sessionKey = useCurrentSession();
     const {mutateAsync: signAndExecuteTransaction} = UseSignAndExecuteTransaction();
 
     const [totalChip, setTotalChip] = useState(10000);
@@ -67,7 +68,9 @@ function Game() {
         target: `0x3::account_coin_store::balance`,
         args: [Args.address(currentAddress?.genRoochAddress().toStr() || "")],
         typeArgs: [`${contractAddress}::${satTokenModule}::SAT<${roochGasCoinType}>`]
-    })
+    });
+
+
   
     return (
       <>
@@ -82,9 +85,24 @@ function Game() {
               <a href={"https://btcstaking.testnet.babylonchain.io/"} className="text-xl underline text-blue-600" target="_blank">Stake more BTC(Babylon)</a>
             </div>
             <div className="mt-5">
-                <Button onClick={handlerCreateSessionKey}>
-                    Create Session Key
-                </Button>
+                {!sessionKey ? (
+                    <Button
+                        onClick={() => {
+                        handlerCreateSessionKey();
+                        }}
+                    >
+                        Create Session Key
+                    </Button>
+                    ) : (
+                    <Button
+                        className="bg-red-500"
+                        onClick={() => {
+                        removeSessionKey({ authKey: sessionKey.getAuthKey() });
+                        }}
+                    >
+                        Clear Session
+                    </Button>
+                )}
             </div>
             <div className="mt-3 mx-auto px-10 py-6 bg-orange-300 rounded-md">
                 <div>
